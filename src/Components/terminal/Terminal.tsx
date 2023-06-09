@@ -38,8 +38,8 @@ const Terminal: React.FC<TerminalProps> = ({
     const [history, setHistory] = React.useState<string[]>([]);
     const [historyIndex, setHistoryIndex] = React.useState<number>(0);
     const [initialCommand, setInitialCommand] = React.useState<string>(`Notlunix\\github\\>${username ? username : 'guest'}@${title.toLowerCase().replace(' ', '')}:~$ `);
-    const [width, setWidth] = React.useState(350);
-    const [height, setHeight] = React.useState(200);
+    const [width, setWidth] = React.useState(600);
+    const [height, setHeight] = React.useState(400);
     const draggableRef = React.useRef(null);
     const innerRef = React.useRef(null);
 
@@ -117,6 +117,8 @@ const Terminal: React.FC<TerminalProps> = ({
             setHeight(window.innerHeight);
             terminalContainer.style.top = '0';
             terminalContainer.style.left = '0';
+            setPosition({x: 0, y: 0});
+
         }
 
     }
@@ -128,6 +130,7 @@ const Terminal: React.FC<TerminalProps> = ({
             setWidth(matchDownSM ? 350 : 600);
             terminalContainer.style.top = '30%';
             terminalContainer.style.left = '30%';
+            setPosition({x: 0, y: 0});
         }
     }
 
@@ -336,7 +339,7 @@ const Terminal: React.FC<TerminalProps> = ({
 
     // ?handle resize of the terminal by stretching the corners (not working perfectly)
     const handleResize = (
-        direction: 'top-left' | 'top-right' | 'bottom-right' | 'bottom-left',
+        direction: "bottom" | "right" | "top" | "left",
         event: React.MouseEvent<HTMLDivElement>
     ) => {
         event.preventDefault();
@@ -346,19 +349,16 @@ const Terminal: React.FC<TerminalProps> = ({
             const deltaX = event.clientX - startX;
             const deltaY = event.clientY - startY;
 
-            if (direction === 'top-left') {
-                setWidth(width - deltaX);
-                setHeight(height - deltaY);
-            } else if (direction === 'top-right') {
-                setWidth(width + deltaX);
-                setHeight(height - deltaY);
-            } else if (direction === 'bottom-right') {
-                setWidth(width + deltaX);
-                setHeight(height + deltaY);
-            } else if (direction === 'bottom-left') {
-                setWidth(width - deltaX);
-                setHeight(height + deltaY);
+            if (direction === 'right') {
+                setWidth(width + deltaX > 600 ? width + deltaX : 600);
+            } else if (direction === 'bottom') {
+                setHeight(height + deltaY > 400 ? height + deltaY : 400);
+            } else if (direction === 'top') {
+                setHeight(height - deltaY > 400 ? height - deltaY : 400);
+            } else if (direction === 'left') {
+                setWidth(width - deltaX > 600 ? width - deltaX : 600);
             }
+
         };
         const handleMouseUp = () => {
             document.removeEventListener('mousemove', handleMouseMove);
@@ -399,7 +399,7 @@ const Terminal: React.FC<TerminalProps> = ({
              ref={draggableRef}
              sx={{
                  overflowY: 'hidden',
-                 width: width > 600 ? width : '80vh', height: height > 300 ? height : '55vh',
+                 width:  width , height: height ,
                  overflowX: 'hidden',
                  backgroundColor: 'rgba(0, 0, 0, 0.56)',
                  backdropFilter: 'blur(7px)',
@@ -485,9 +485,9 @@ const Terminal: React.FC<TerminalProps> = ({
                 <Typography component={'pre'}>{`------------- ${today.toLocaleString()} -------------`}</Typography>
                 <Typography component={'pre'}>© 2023 abderox</Typography>
                 <Typography component={'pre'}>Developed by :<a style={{color: 'skyblue', textDecoration: 'none'}}
-                    href={"https://github.com/abderox.com"}> {`https://github.com/abderox.com`}</a>
+                    href={"https://github.com/abderox"}> {`https://github.com/abderox`}</a>
                 </Typography>
-                <Typography component={'pre'}>Version : 1.0.0</Typography>
+                <Typography component={'pre'}>Version : 1.1.0</Typography>
                 <Typography component={'pre'}>Current user : {username ? username : 'Guest'}</Typography>
                 <div>
                     {message !== '' && <pre>{message}</pre>}
@@ -543,50 +543,37 @@ const Terminal: React.FC<TerminalProps> = ({
             <div
                 style={{
                     position: 'absolute',
-                    top: '-5px',
-                    left: '-5px',
-                    width: '40px',
-                    height: '15px',
-                    cursor: 'nwse-resize',
-                    background: 'transparent',
-                }}
-                onMouseDown={(e) => handleResize('top-left', e)}
-            />
-            <div
-                style={{
-                    position: 'absolute',
-                    top: '-5px',
-                    right: '-5px',
-                    width: '40px',
-                    height: '15px',
-                    cursor: 'nesw-resize',
-                    background: 'transparent',
-                }}
-                onMouseDown={(e) => handleResize('top-right', e)}
-            />
-            <div
-                style={{
-                    position: 'absolute',
                     bottom: '-5px',
-                    right: '-5px',
-                    width: '40px',
-                    height: '15px',
-                    cursor: 'nwse-resize',
+                    width: '100%',
+                    height: '10px',
+                    cursor: 'ns-resize',
                     background: 'transparent',
                 }}
-                onMouseDown={(e) => handleResize('bottom-right', e)}
+                onMouseDown={(e) => handleResize('bottom', e)}
             />
             <div
                 style={{
                     position: 'absolute',
+                    right: '-5px',
                     bottom: '-5px',
-                    left: '-5px',
-                    width: '40px',
-                    height: '15px',
-                    cursor: 'nesw-resize',
+                    width: '10px',
+                    height: '100%',
+                    cursor: 'ew-resize',
                     background: 'transparent',
                 }}
-                onMouseDown={(e) => handleResize('bottom-left', e)}
+                onMouseDown={(e) => handleResize('right', e)}
+            />
+            <div
+                style={{
+                    position: 'absolute',
+                    left: '5px',
+                    bottom: '-5px',
+                    width: '10px',
+                    height: '100%',
+                    cursor: 'ew-resize',
+                    background: 'transparent',
+                }}
+                onMouseDown={(e) => handleResize('left', e)}
             />
 
         </Box>
